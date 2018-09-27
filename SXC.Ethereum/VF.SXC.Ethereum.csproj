@@ -101,6 +101,10 @@
     <Reference Include="Sitecore.Commerce.Engine.Connect">
       <HintPath>..\..\..\..\..\..\inetpub\wwwroot\jmm.sc\bin\Sitecore.Commerce.Engine.Connect.dll</HintPath>
     </Reference>
+    <Reference Include="Sitecore.Commerce.ServiceProxy, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\inetpub\wwwroot\jmm.sc\bin\Sitecore.Commerce.ServiceProxy.dll</HintPath>
+    </Reference>
     <Reference Include="Sitecore.Commerce.XA.Feature.Catalog">
       <HintPath>..\..\..\..\..\..\inetpub\wwwroot\jmm.sc\bin\Sitecore.Commerce.XA.Feature.Catalog.dll</HintPath>
       <Private>False</Private>
@@ -208,6 +212,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Conditions\CustomerHasPurchasedProduct.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="Processors\GetUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
