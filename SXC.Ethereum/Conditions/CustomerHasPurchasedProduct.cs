@@ -22,7 +22,7 @@ namespace VF.SXC.Ethereum.Conditions
             var contextUser = Sitecore.Context.User;
             var commerceUser = GetCommerceUser(contextUser);
 
-            var ethContractAddress = commerceUser.GetPropertyValue(Constants.IdentityContractAddressFieldName) as string; // Settings.GetSetting("VF.SXC.Ethereum.IdentityContractAddress"); //contextUser.Profile.GetCustomProperty("EthereiumIdentityContract");
+            var ethContractAddress = commerceUser.GetPropertyValue(Constants.IdentityContractAddressFieldName) as string ?? Settings.GetSetting("VF.SXC.Ethereum.IdentityContractAddress");
             var nodeUrl = Settings.GetSetting("VF.SXC.Ethereum.NodeUrl");
             var sxaEthAccountAddress = Settings.GetSetting("VF.SXC.Ethereum.SXAEthAccountAddress");
 
