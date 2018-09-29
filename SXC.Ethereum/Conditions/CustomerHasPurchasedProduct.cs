@@ -12,6 +12,7 @@ using Sitecore.Rules.Conditions;
 using Sitecore.Security.Accounts;
 using System.Linq;
 using System.Web;
+using VF.SXC.Ethereum.Utilities;
 
 namespace VF.SXC.Ethereum.Conditions
 {
@@ -20,7 +21,7 @@ namespace VF.SXC.Ethereum.Conditions
         protected override bool Execute(T ruleContext)
         {
             var contextUser = Sitecore.Context.User;
-            var commerceUser = GetCommerceUser(contextUser);
+            var commerceUser = Customer.GetCommerceUser(contextUser);
 
             var ethContractAddress = commerceUser.GetPropertyValue(Constants.IdentityContractAddressFieldName) as string ?? Settings.GetSetting("VF.SXC.Ethereum.IdentityContractAddress");
             var nodeUrl = Settings.GetSetting("VF.SXC.Ethereum.NodeUrl");
@@ -45,37 +46,13 @@ namespace VF.SXC.Ethereum.Conditions
             var checkProductFunction = idContract.GetFunction("contactHasPurchasedProduct");
 
             var url = HttpContext.Current.Request.Url.AbsolutePath;
-            if(string.IsNullOrWhiteSpace(url))
-            {
-                Log.Warn("Ethereum: The context URL is null or empty.", this);
-                return false;
-            }
-
-            var productId = url.Split('=').LastOrDefault();
-
-            if(string.IsNullOrWhiteSpace(productId))
-            {
-                Log.Error("Ethereum: the URL does not follow the expected format. Unable to get product Id.", this);
-                return false;
-            }
+            var productId = Product.GetProductIdFromUrl(url);
 
             var hasProduct = checkProductFunction.CallAsync<bool>(productId).Result;
 
             return hasProduct;
         }
 
-        private CommerceUser GetCommerceUser(User user)
-        {
-            var connectServiceProvider = new ConnectServiceProvider();
-            var getCustomerServieProvider = connectServiceProvider.GetCustomerServiceProvider();
-            var userResult = getCustomerServieProvider.GetUser(new GetUserRequest(user.Profile.UserName));
-            if (!userResult.Success || userResult.CommerceUser == null)
-            {
-                return null;
-            }
-
-            var commerceUser = userResult.CommerceUser;
-            return commerceUser;
-        }
+        
     }
 }
