@@ -27,7 +27,7 @@ namespace VF.SXC.Ethereum.Processors
 
         protected virtual void TranslateBlockchainInfo(TranslateCartLineToEntityRequest request, CartLineComponent source, CommerceCartLine destination)
         {
-            var blokchainTokenComponent = source.ChildComponents.FirstOrDefault(c => c.Name.ToLower() == "BlockchainDownloadToken".ToLower()) as DigitalDownloadBlockchainTokenComponent;
+            var blokchainTokenComponent = source.CartLineComponents.FirstOrDefault(c => c is DigitalDownloadBlockchainTokenComponent) as DigitalDownloadBlockchainTokenComponent;
             if (blokchainTokenComponent == null)
                 return;
             destination.SetPropertyValue(Constants.BlockchainDownloadToken, blokchainTokenComponent.BlockchainDownloadToken);

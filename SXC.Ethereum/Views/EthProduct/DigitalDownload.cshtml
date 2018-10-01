@@ -1,9 +1,23 @@
 ﻿@model string
 @{ 
     var token = ViewBag.BlockchainDownloadToken;
+    if (string.IsNullOrWhiteSpace(token))
+    {
+        return;
+    }
 }
+<style>
+    .cxa-addtocart-component, .price-info, .stock-info, .cxa-productvariant-component {
+        display: none !important
+    }
+    .congrats {font-weight:bold}
+</style>
 
 <div>
-    Looks like you've purchased this before, you can Download it right here!
-    @token
+    <p class="congrats">
+        Looks like you already own viewing rights to this video, you can view it right here!
+    </p><br />
+    <iframe width="530" height="298" src="https://www.youtube.com/embed/@token" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    
+    <p>Access powered by blockchain identity.</p>
 </div>
