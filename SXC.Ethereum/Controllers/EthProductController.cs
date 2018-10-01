@@ -17,7 +17,7 @@ namespace VF.SXC.Ethereum.Controllers
         public ActionResult DigitalDownload()
         {
             var contextUser = Sitecore.Context.User;
-            if (contextUser == null)
+            if (contextUser == null || !contextUser.IsAuthenticated)
                 return new EmptyResult();
 
             var shopName = "JoyceMeyer";
