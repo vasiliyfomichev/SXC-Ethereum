@@ -50,7 +50,7 @@ namespace VF.SXC.Ethereum.Controllers
                 {
                     if(line.Product.ProductId.ToLower() == productId.ToLower())
                     {
-                        if (line == null || line.GetPropertyValue(Constants.BlockchainDownloadToken) == null)
+                        if (line == null || !line.ContainsKey(Constants.BlockchainDownloadToken))
                             continue;
                         productDownloadToken =  line.GetPropertyValue(Constants.BlockchainDownloadToken) as string;
                         isTokenSet = true;
