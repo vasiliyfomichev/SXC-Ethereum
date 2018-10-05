@@ -1,4 +1,5 @@
-﻿using Sitecore.Commerce.Services.Orders;
+﻿using Nethereum.Web3;
+using Sitecore.Commerce.Services.Orders;
 using Sitecore.Commerce.XA.Foundation.Connect.Providers;
 using Sitecore.Configuration;
 using Sitecore.Diagnostics;
@@ -14,13 +15,65 @@ namespace VF.SXC.Ethereum.Controllers
 {
     public class EthProductController : SitecoreController
     {
-        public ActionResult DigitalDownload()
+        public ActionResult DigitalDownloadRemote()
         {
             var contextUser = Sitecore.Context.User;
             if (contextUser == null || !contextUser.IsAuthenticated)
                 return new EmptyResult();
 
-            var shopName = Settings.GetAppSetting("VF.SXC.Ethereum.ShopName", "JoyceMeyer");
+            var commerceUser = Customer.GetCommerceUser(contextUser);
+
+            var ethContractAddress = commerceUser.GetPropertyValue(Constants.IdentityContractAddressFieldName) as string ?? Settings.GetSetting("VF.SXC.Ethereum.IdentityContractAddress");
+            var nodeUrl = Settings.GetSetting("VF.SXC.Ethereum.NodeUrl");
+            var sxaEthAccountAddress = Settings.GetSetting("VF.SXC.Ethereum.SXAEthAccountAddress");
+
+            if (string.IsNullOrWhiteSpace(nodeUrl))
+            {
+                Log.Warn("Ethereum: Missing NodeUrl configuration setting. Cannot connect to the blockchain.", this);
+                return new EmptyResult();
+            }
+
+            var abi = Settings.GetSetting("VF.SXC.Ethereum.IdentityContractABI");
+            if (string.IsNullOrWhiteSpace(abi))
+            {
+                Log.Warn("Ethereum: Missing ABI configuration setting. Cannot connect to the blockchain.", this);
+                return new EmptyResult();
+            }
+
+
+            var web3 = new Web3(nodeUrl);
+            var idContract = web3.Eth.GetContract(abi, ethContractAddress);
+            var checkProductFunction = idContract.GetFunction("contactHasPurchasedProduct");
+
+            var url = Request.Url.AbsolutePath;
+            var productId = Product.GetProductIdFromUrl(url);
+
+            var hasProduct = checkProductFunction.CallAsync<bool>(productId).Result;
+            if(!hasProduct)
+                return new EmptyResult();
+
+            var royalryCcontractAddress = Settings.GetSetting("VF.SXC.Ethereum.RoyaltyContractAddress");
+            var royalryCcontractAbi = Settings.GetSetting("VF.SXC.Ethereum.RoyaltyContractABI");
+            var royaltyContract = web3.Eth.GetContract(royalryCcontractAbi, royalryCcontractAddress);
+            var getPurchasedProductUrlFunctino = royaltyContract.GetFunction("getPurchasedAssetUrl");
+            var productDownloadToken = getPurchasedProductUrlFunctino.CallAsync<string>(productId, ethContractAddress).Result;
+
+            if (string.IsNullOrWhiteSpace(productDownloadToken))
+                return new EmptyResult();
+
+            ViewBag.BlockchainDownloadToken = productDownloadToken;
+            return View("DigitalDownload");
+        }
+
+
+
+            public ActionResult DigitalDownload()
+        {
+            var contextUser = Sitecore.Context.User;
+            if (contextUser == null || !contextUser.IsAuthenticated)
+                return new EmptyResult();
+
+            var shopName = Settings.GetSetting("VF.SXC.Ethereum.ShopName", "JoyceMeyer");
             var commerceCustomer = Customer.GetCommerceUser(contextUser);
             var ethContractAddress = commerceCustomer.GetPropertyValue(Constants.IdentityContractAddressFieldName) as string ?? Settings.GetSetting("VF.SXC.Ethereum.IdentityContractAddress");
 

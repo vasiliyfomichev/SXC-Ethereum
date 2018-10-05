@@ -29,8 +29,9 @@ namespace VF.SXC.Ethereum.Processors
             commerceUser.UserName = view.Properties.FirstOrDefault(p => p.Name.Equals("UserName")).Value;
             commerceUser.Email = view.Properties.FirstOrDefault(p => p.Name.Equals("Email")).Value;
             commerceUser.SetPropertyValue("Phone", view.Properties.FirstOrDefault(p => p.Name.Equals("PhoneNumber")).Value);
-            commerceUser.SetPropertyValue(Constants.IdentityContractAddressFieldName, (view.ChildViews.FirstOrDefault(v=>v.Name.ToLower()== "blockchaininformation") as EntityView).Properties.FirstOrDefault(p=>p.Name == Constants.IdentityContractAddressFieldName).Value);
-
+            if (view.ChildViews!=null && view.ChildViews.Any(v => v.Name.ToLower() == "blockchaininformation")) {
+                commerceUser.SetPropertyValue(Constants.IdentityContractAddressFieldName, (view.ChildViews.FirstOrDefault(v => v.Name.ToLower() == "blockchaininformation") as EntityView).Properties.FirstOrDefault(p => p.Name == Constants.IdentityContractAddressFieldName).Value);
+            }
             Assert.IsNotNullOrEmpty(commerceUser.ExternalId, "commerceUser.ExternalId");
             if (commerceUser.Customers == null || commerceUser.Customers.Count == 0)
             {

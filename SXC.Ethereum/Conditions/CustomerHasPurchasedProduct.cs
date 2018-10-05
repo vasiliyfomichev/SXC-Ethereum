@@ -21,6 +21,9 @@ namespace VF.SXC.Ethereum.Conditions
         protected override bool Execute(T ruleContext)
         {
             var contextUser = Sitecore.Context.User;
+            if (!contextUser.IsAuthenticated)
+                return false;
+
             var commerceUser = Customer.GetCommerceUser(contextUser);
 
             var ethContractAddress = commerceUser.GetPropertyValue(Constants.IdentityContractAddressFieldName) as string ?? Settings.GetSetting("VF.SXC.Ethereum.IdentityContractAddress");
