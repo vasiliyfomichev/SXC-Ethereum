@@ -2,10 +2,6 @@
 using Sitecore.Commerce.Services.Customers;
 using Sitecore.Commerce.XA.Foundation.Connect.Providers;
 using Sitecore.Security.Accounts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace VF.SXC.Ethereum.Utilities
 {
@@ -16,10 +12,7 @@ namespace VF.SXC.Ethereum.Utilities
             var connectServiceProvider = new ConnectServiceProvider();
             var getCustomerServieProvider = connectServiceProvider.GetCustomerServiceProvider();
             var userResult = getCustomerServieProvider.GetUser(new GetUserRequest(user.Profile.UserName));
-            if (!userResult.Success || userResult.CommerceUser == null)
-            {
-                return null;
-            }
+            if (!userResult.Success || userResult.CommerceUser == null) return null;
 
             var commerceUser = userResult.CommerceUser;
             return commerceUser;

@@ -1,5 +1,5 @@
 ﻿@model string
-@{ 
+@{
     var token = ViewBag.BlockchainDownloadToken;
     if (string.IsNullOrWhiteSpace(token))
     {
@@ -10,34 +10,34 @@
 <div>
     <p class="congrats">
         Congratulations! Looks like you already own rights to this game, you can download it right here!
-    </p><br />
-<div class="cxa-add-to-wishlist-component button">
-			<a href="-/media/Blockchain/@token" class="btn">Download Now</a>
-			</div><br />
+    </p><br/>
+    <div class="cxa-add-to-wishlist-component button">
+        <a href="-/media/Blockchain/@token" class="btn">Download Now</a>
+    </div><br/>
     <p>Access powered by blockchain identity.</p>
 </div>
-<br /><br />
+<br/><br/>
 <style>
 
-.cxa-add-to-wishlist-component a {
-    border: 2px solid #0e909f;
-    font-size: 14px !important;
-    font-weight: 400;
-    text-align: center !important;
-    background: #0e909f;
-    color: #fff !important;
-    text-shadow: none;
-    box-shadow: none;
-    display: inline-block;
-    cursor: pointer;
-    border-radius: 0;
-    min-height: 42px;
-    height: 42px;
-    padding: 8px 25px 8px 25px;
-    min-width: 150px;
-	}
-	.cxa-addtocart-component, .price-info, .stock-info, .cxa-productvariant-component, #AddToWishList {
-        display: none !important
+    .cxa-add-to-wishlist-component a {
+        background: #0e909f;
+        border: 2px solid #0e909f;
+        border-radius: 0;
+        box-shadow: none;
+        color: #fff !important;
+        cursor: pointer;
+        display: inline-block;
+        font-size: 14px !important;
+        font-weight: 400;
+        height: 42px;
+        min-height: 42px;
+        min-width: 150px;
+        padding: 8px 25px 8px 25px;
+        text-align: center !important;
+        text-shadow: none;
     }
-    p.congrats {font-weight:bold !important}
+
+    .cxa-addtocart-component, .price-info, .stock-info, .cxa-productvariant-component, #AddToWishList { display: none !important }
+
+    p.congrats { font-weight: bold !important }
 </style>

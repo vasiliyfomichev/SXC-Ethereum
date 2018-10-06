@@ -1,17 +1,10 @@
-﻿using Nethereum.Web3;
-using Sitecore.Commerce.Engine.Connect.Pipelines.Arguments;
-using Sitecore.Commerce.Entities.Customers;
-using Sitecore.Commerce.Services;
-using Sitecore.Commerce.Services.Customers;
-using Sitecore.Commerce.XA.Feature.Catalog.Repositories;
-using Sitecore.Commerce.XA.Foundation.Connect.Providers;
+﻿using System.Web;
+using Nethereum.Web3;
+using Sitecore;
 using Sitecore.Configuration;
 using Sitecore.Diagnostics;
 using Sitecore.Rules;
 using Sitecore.Rules.Conditions;
-using Sitecore.Security.Accounts;
-using System.Linq;
-using System.Web;
 using VF.SXC.Ethereum.Utilities;
 
 namespace VF.SXC.Ethereum.Conditions
@@ -20,13 +13,15 @@ namespace VF.SXC.Ethereum.Conditions
     {
         protected override bool Execute(T ruleContext)
         {
-            var contextUser = Sitecore.Context.User;
+            var contextUser = Context.User;
             if (!contextUser.IsAuthenticated)
                 return false;
 
             var commerceUser = Customer.GetCommerceUser(contextUser);
 
-            var ethContractAddress = commerceUser.GetPropertyValue(Constants.IdentityContractAddressFieldName) as string ?? Settings.GetSetting("VF.SXC.Ethereum.IdentityContractAddress");
+            var ethContractAddress =
+                commerceUser.GetPropertyValue(Constants.IdentityContractAddressFieldName) as string ??
+                Settings.GetSetting("VF.SXC.Ethereum.IdentityContractAddress");
             var nodeUrl = Settings.GetSetting("VF.SXC.Ethereum.NodeUrl");
             var sxaEthAccountAddress = Settings.GetSetting("VF.SXC.Ethereum.SXAEthAccountAddress");
 
@@ -55,7 +50,5 @@ namespace VF.SXC.Ethereum.Conditions
 
             return hasProduct;
         }
-
-        
     }
 }

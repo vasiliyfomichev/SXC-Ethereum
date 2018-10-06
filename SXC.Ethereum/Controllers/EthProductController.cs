@@ -1,14 +1,12 @@
-﻿using Nethereum.Web3;
+﻿using System.Linq;
+using System.Web.Mvc;
+using Nethereum.Web3;
+using Sitecore;
 using Sitecore.Commerce.Services.Orders;
 using Sitecore.Commerce.XA.Foundation.Connect.Providers;
 using Sitecore.Configuration;
 using Sitecore.Diagnostics;
 using Sitecore.Mvc.Controllers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
 using VF.SXC.Ethereum.Utilities;
 
 namespace VF.SXC.Ethereum.Controllers
@@ -17,13 +15,15 @@ namespace VF.SXC.Ethereum.Controllers
     {
         public ActionResult DigitalDownloadRemote()
         {
-            var contextUser = Sitecore.Context.User;
+            var contextUser = Context.User;
             if (contextUser == null || !contextUser.IsAuthenticated)
                 return new EmptyResult();
 
             var commerceUser = Customer.GetCommerceUser(contextUser);
 
-            var ethContractAddress = commerceUser.GetPropertyValue(Constants.IdentityContractAddressFieldName) as string ?? Settings.GetSetting("VF.SXC.Ethereum.IdentityContractAddress");
+            var ethContractAddress =
+                commerceUser.GetPropertyValue(Constants.IdentityContractAddressFieldName) as string ??
+                Settings.GetSetting("VF.SXC.Ethereum.IdentityContractAddress");
             var nodeUrl = Settings.GetSetting("VF.SXC.Ethereum.NodeUrl");
             var sxaEthAccountAddress = Settings.GetSetting("VF.SXC.Ethereum.SXAEthAccountAddress");
 
@@ -49,14 +49,15 @@ namespace VF.SXC.Ethereum.Controllers
             var productId = Product.GetProductIdFromUrl(url);
 
             var hasProduct = checkProductFunction.CallAsync<bool>(productId).Result;
-            if(!hasProduct)
+            if (!hasProduct)
                 return new EmptyResult();
 
             var royalryCcontractAddress = Settings.GetSetting("VF.SXC.Ethereum.RoyaltyContractAddress");
             var royalryCcontractAbi = Settings.GetSetting("VF.SXC.Ethereum.RoyaltyContractABI");
             var royaltyContract = web3.Eth.GetContract(royalryCcontractAbi, royalryCcontractAddress);
             var getPurchasedProductUrlFunctino = royaltyContract.GetFunction("getPurchasedAssetUrl");
-            var productDownloadToken = getPurchasedProductUrlFunctino.CallAsync<string>(productId, ethContractAddress).Result;
+            var productDownloadToken =
+                getPurchasedProductUrlFunctino.CallAsync<string>(productId, ethContractAddress).Result;
 
             if (string.IsNullOrWhiteSpace(productDownloadToken))
                 return new EmptyResult();
@@ -66,25 +67,29 @@ namespace VF.SXC.Ethereum.Controllers
         }
 
 
-
-            public ActionResult DigitalDownload()
+        public ActionResult DigitalDownload()
         {
-            var contextUser = Sitecore.Context.User;
+            var contextUser = Context.User;
             if (contextUser == null || !contextUser.IsAuthenticated)
                 return new EmptyResult();
 
             var shopName = Settings.GetSetting("VF.SXC.Ethereum.ShopName", "JoyceMeyer");
             var commerceCustomer = Customer.GetCommerceUser(contextUser);
-            var ethContractAddress = commerceCustomer.GetPropertyValue(Constants.IdentityContractAddressFieldName) as string ?? Settings.GetSetting("VF.SXC.Ethereum.IdentityContractAddress");
+            var ethContractAddress =
+                commerceCustomer.GetPropertyValue(Constants.IdentityContractAddressFieldName) as string ??
+                Settings.GetSetting("VF.SXC.Ethereum.IdentityContractAddress");
 
             var url = Request.Url.AbsolutePath;
             var productId = Product.GetProductIdFromUrl(url);
 
             var connectServiceProvider = new ConnectServiceProvider();
             var orderServiceProvider = connectServiceProvider.GetOrderServiceProvider();
-            var orderHeaderResult = orderServiceProvider.GetVisitorOrders(new GetVisitorOrdersRequest(commerceCustomer.ExternalId, shopName));
+            var orderHeaderResult =
+                orderServiceProvider.GetVisitorOrders(
+                    new GetVisitorOrdersRequest(commerceCustomer.ExternalId, shopName));
 
-            if (!orderHeaderResult.Success || orderHeaderResult.OrderHeaders == null || !orderHeaderResult.OrderHeaders.Any())
+            if (!orderHeaderResult.Success || orderHeaderResult.OrderHeaders == null ||
+                !orderHeaderResult.OrderHeaders.Any())
                 return new EmptyResult();
 
             var productDownloadToken = string.Empty;
@@ -93,31 +98,30 @@ namespace VF.SXC.Ethereum.Controllers
             foreach (var orderHeader in orderHeaders)
             {
                 var orderId = orderHeader.ExternalId;
-                var orderResult = orderServiceProvider.GetVisitorOrder(new GetVisitorOrderRequest(orderId, commerceCustomer.ExternalId, shopName));
+                var orderResult =
+                    orderServiceProvider.GetVisitorOrder(new GetVisitorOrderRequest(orderId,
+                        commerceCustomer.ExternalId, shopName));
 
                 if (!orderResult.Success || orderResult.Order == null || !orderResult.Order.Lines.Any())
                     continue;
 
                 var orderLines = orderResult.Order.Lines;
                 foreach (var line in orderLines)
-                {
-                    if(line.Product.ProductId.ToLower() == productId.ToLower())
+                    if (line.Product.ProductId.ToLower() == productId.ToLower())
                     {
                         if (line == null || !line.ContainsKey(Constants.BlockchainDownloadToken))
                             continue;
-                        productDownloadToken =  line.GetPropertyValue(Constants.BlockchainDownloadToken) as string;
+                        productDownloadToken = line.GetPropertyValue(Constants.BlockchainDownloadToken) as string;
                         isTokenSet = true;
-                        break; 
+                        break;
                     }
-                }
+
                 if (isTokenSet)
                     break;
             }
 
-            if(isTokenSet && string.IsNullOrWhiteSpace(productDownloadToken))
-            {
+            if (isTokenSet && string.IsNullOrWhiteSpace(productDownloadToken))
                 Log.Warn("Ethereum: token is set, but empty.", this);
-            }
 
             ViewBag.BlockchainDownloadToken = productDownloadToken;
             return View();

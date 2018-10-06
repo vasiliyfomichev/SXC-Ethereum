@@ -1,8 +1,5 @@
-﻿using Sitecore.Diagnostics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Linq;
+using Sitecore.Diagnostics;
 
 namespace VF.SXC.Ethereum.Utilities
 {
@@ -10,7 +7,6 @@ namespace VF.SXC.Ethereum.Utilities
     {
         public static string GetProductIdFromUrl(string url)
         {
-            
             if (string.IsNullOrWhiteSpace(url))
             {
                 Log.Warn("Ethereum: The context URL is null or empty.", url);
@@ -21,7 +17,8 @@ namespace VF.SXC.Ethereum.Utilities
 
             if (string.IsNullOrWhiteSpace(productId))
             {
-                Log.Error("Ethereum: the URL does not follow the expected format. Unable to get product Id.", productId);
+                Log.Error("Ethereum: the URL does not follow the expected format. Unable to get product Id.",
+                    productId);
                 return string.Empty;
             }
 
