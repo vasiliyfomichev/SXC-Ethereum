@@ -73,7 +73,7 @@ namespace VF.SXC.Ethereum.Controllers
             if (contextUser == null || !contextUser.IsAuthenticated)
                 return new EmptyResult();
 
-            var shopName = Settings.GetSetting("VF.SXC.Ethereum.ShopName", "JoyceMeyer");
+            var shopName = Settings.GetSetting("VF.SXC.Ethereum.ShopName", "Storefront");
             var commerceCustomer = Customer.GetCommerceUser(contextUser);
             var ethContractAddress =
                 commerceCustomer.GetPropertyValue(Constants.IdentityContractAddressFieldName) as string ??
